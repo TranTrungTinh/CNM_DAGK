@@ -1,5 +1,5 @@
 # CNM_DAGK
-# Install
+# Project clone basic uber app (web app)
 # yarn/npm install
 # yarn/mpn start
 # run: localhost:3000 // app_phone_staff
