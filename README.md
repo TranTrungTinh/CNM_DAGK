@@ -1,7 +1,7 @@
 <snippet>
-  <content><![CDATA[
+  <content>
 
-# ${1: CNM_MIDTERM_PROJECT}
+# CNM_MIDTERM_PROJECT
 
 Example project using Google Maps API with Socket.io server.
 
@@ -22,6 +22,6 @@ Start the server
 Then you can go to http://localhost:3000 open site order car.
 Then you can go to http://localhost:4000 open maps.
 
-]]></content>
+</content>
   <tabTrigger>readme</tabTrigger>
 </snippet>
