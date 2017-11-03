@@ -22,6 +22,5 @@ Start the server
 Then you can go to http://localhost:3000 open site order car.
 Then you can go to http://localhost:4000 open maps.
 
-</content>
-  <tabTrigger>readme</tabTrigger>
+  </content>
 </snippet>
