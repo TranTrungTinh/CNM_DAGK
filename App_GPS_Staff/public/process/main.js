@@ -1,5 +1,6 @@
 $(function() {
     let map = null;
+    const arrVehicle = [];
     const mapDiv = document.getElementById('map');
     const myLocation = new google.maps.LatLng(10.8230989 , 106.6296638);
     const mapOptions = {
@@ -175,33 +176,54 @@ $(function() {
             position: myLocation,
             map: map,
             animation: google.maps.Animation.BOUNCE,
-            icon: './resources/man_green.png'
+            icon: './resources/man_green.png',
+            title: 'User is waiting the vehicle'
         });
+        const content = `<div>
+        <button type="button" class="btn btn-outline-info">Choose</button>
+        </div>`;
+        const info = new google.maps.InfoWindow({
+            content,
+            maxWidth: 200
+        });
+        marker.addListener('click' ,() => {
+          // info.open(map,marker)
+          const positionUser = marker.getPosition();
+          arrVehicle.forEach(e => {
+            const positionCar = e.getPosition();
+            const distance = google.maps.geometry.spherical.computeDistanceBetween(positionUser, positionCar);
+            console.log(distance);
+          });
+          
+
+        });
+        map.addListener('click',() => info.close())
     }
     
+    
+
     // create marker
     function createMarkers(pos) {
       const newMarker = new google.maps.Marker({
         position: pos,
         map: map,
         animation: google.maps.Animation.DROP,
-        icon: './resources/car_green.png'
+        icon: './resources/car_green.png',
+        title: 'This is vehicle'
       });
+      arrVehicle.push(newMarker);
     }
 
     // socket.io
     const socket = io();
     socket.on('LIST_RIDER' , arrRider => {
-        // console.log(arrRider);
-        setTimeout(() => {
-          arrRider.forEach(e => {
-            const pos = {lat: +e.lat , lng: +e.lng};
-            const position = new google.maps.LatLng(pos);
-            createMarkers(pos);
-            // const distance = google.maps.geometry.spherical.computeDistanceBetween(myLocation , position , 6378137);
-            // console.log(distance);
-          });
-        });
+      arrRider.forEach(e => {
+        const pos = { lat: +e.lat, lng: +e.lng };
+        // const position = new google.maps.LatLng(pos);
+        createMarkers(pos);
+        // const distance = google.maps.geometry.spherical.computeDistanceBetween(myLocation , position , 6378137);
+      });
+      // console.log(arrVehicle);
     });
 
     // call function

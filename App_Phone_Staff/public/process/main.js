@@ -13,13 +13,16 @@ $('#btn_order').click(e => {
         lat: userLat,
         lng: userLng,
         other: otherDetails,
-        bike: vehicle
+        bike: vehicle,
+        state: false  // chua duoc xe xac nhan
     }
     $.post('/order', order , result => {
         if(result.message) return swal("Thanh cong","Order thanh cong","success");
         swal("That bai","Vui long thu lai","error");
     });
-    
+    $('#phone').val('');
+    $('#otherDetails').val('');
+    $('#address').val('');
 });
 
 function autoComplete() {
