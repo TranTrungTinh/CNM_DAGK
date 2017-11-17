@@ -5,7 +5,7 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
 // import my function
-const Rider = require('./model/Rider');
+const Driver = require('./model/Rider');
 const db = require('./model/fbConfig');
 
 // settup static
@@ -17,12 +17,15 @@ app.use(express.static('public'));
 app.get('/', (req, res) => res.render('home'));
 server.listen(4000, () => console.log('Server has been started!'));
 
-// realtime child_added
-db().ref('users').on('child_added' , user => {
-    console.log(user.key , user.val());
-});
-
 // socket.io
 io.on('connection' , socket => {
-    io.emit('LIST_RIDER' , Rider.getAllRider());
+    io.emit('LIST_RIDER' , Driver.getAllRider());
+
+    // realtime child_added
+    db().ref('users').on('child_added' , user => {
+        // console.log(user.key , user.val());
+        if(!user.val().state) return;
+        const rider = {key: user.key, ...user.val()};
+        io.emit('NEW_RIDER', rider); 
+    });
 });
