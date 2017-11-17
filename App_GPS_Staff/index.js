@@ -5,7 +5,7 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
 // import my function
-const Driver = require('./model/Rider');
+const Driver = require('./model/Driver');
 const db = require('./model/fbConfig');
 
 // settup static

@@ -2,6 +2,8 @@ $(function() {
   let curentWindow = false; // toggle window info
   const arrVehicle = [];
   const arrRider = [];
+
+  // set defaut map first run
   const mapDiv = document.getElementById('map');
   const myLocation = new google.maps.LatLng(10.8230989, 106.6296638);
   const mapOptions = {
@@ -170,40 +172,31 @@ $(function() {
       }
     ]
   }
+
   // create map
   const map = new google.maps.Map(mapDiv, mapOptions);
-  function initMap() {
-
-    // const marker = new google.maps.Marker({
-    //     position: myLocation,
-    //     map: map,
-    //     animation: google.maps.Animation.BOUNCE,
-    //     icon: './resources/man_green.png',
-    //     title: 'User is waiting the vehicle'
-    // });
-    // const content = `<div>
-    // <button type="button" class="btn btn-outline-info">Choose</button>
-    // </div>`;
-    // const info = new google.maps.InfoWindow({
-    //     content,
-    //     maxWidth: 200
-    // });
-    // marker.addListener('click' ,() => {
-    //   // info.open(map,marker)
-    //   const positionUser = marker.getPosition();
-    //   arrVehicle.forEach(e => {
-    //     const positionCar = e.getPosition();
-    //     const distance = google.maps.geometry.spherical.computeDistanceBetween(positionUser, positionCar);
-    //     console.log(distance);
-    //   });
+  /* -------------------------------------------------------------- */
 
 
-    // });
-    // map.addListener('click',() => info.close())
-  }
+  // socket.io
+  const socket = io();
+  socket.on('LIST_RIDER', arrDriver => {
+    arrDriver.forEach(e => {
+      const pos = { lat: +e.lat, lng: +e.lng };
+      createVehicleMarkers(pos);
+    });
+  });
+  socket.on('NEW_RIDER', rider => {
+    const pos = { lat: +rider.lat, lng: +rider.lng };
+    const { key } = rider;
+    createUserMarkers(pos, key);
+  });
 
 
 
+
+
+  /* -------------------------------------------------------------- */
   // create marker
   function createVehicleMarkers(pos) {
     const newMarker = new google.maps.Marker({
@@ -217,14 +210,13 @@ $(function() {
   }
 
   function createUserMarkers(pos, key) {
-    const content = `<div class="infoWindow">
-      <button type="button" class="btn btn-outline-info" id="${key}">Call Driver</button>
-      </div>`;
+    const content = `<div>
+      <button type="button" class="btn btn-outline-danger" id="${key}">Call Driver</button></div>`;
     const info = new google.maps.InfoWindow({
       content,
-      maxWidth: 200
+      maxWidth: 100
     });
-    const newMarker = new google.maps.Marker({
+    const riderMarker = new google.maps.Marker({
       position: pos,
       map: map,
       animation: google.maps.Animation.BOUNCE,
@@ -232,43 +224,63 @@ $(function() {
       title: 'Rider is waiting the diver'
     });
 
-    newMarker.addListener('click', () => {
+    // event click rider
+    riderMarker.addListener('click', () => {
+      riderMarker.setAnimation(null);
+      
       if (curentWindow) {
         curentWindow.close();
-      }
+      } // toggle infowindow
       curentWindow = info;
-      info.open(map, newMarker);
+      info.open(map, riderMarker);
+      
+      // handle call driver
       $(`#${key}`).off('click');
       $(`#${key}`).on('click', e => {
           e.preventDefault();
-          console.log(key);
+          const positionUser = riderMarker.getPosition();
+          const arrDistance = arrVehicle.map(e => {
+            const positionCar = e.getPosition();
+            const distance = google.maps.geometry.spherical.computeDistanceBetween(positionUser, positionCar);
+            return {distance , vehicle: e};
+          });
+          // console.log(arrDistance);
+          const minDistance = arrDistance.sort((a,b) => a.distance - b.distance)[0];
+          calculateAndDisplayRoute(minDistance.vehicle , riderMarker);
+          info.close();
       });
-      
     });
     map.addListener('click', () => info.close());
-    
   }
 
-  // socket.io
-  const socket = io();
-  socket.on('LIST_RIDER', arrDriver => {
-    arrDriver.forEach(e => {
-      const pos = { lat: +e.lat, lng: +e.lng };
-      // const position = new google.maps.LatLng(pos);
-      createVehicleMarkers(pos);
-      // const distance = google.maps.geometry.spherical.computeDistanceBetween(myLocation , position , 6378137);
-    });
-    // console.log(arrVehicle);
-  });
-  socket.on('NEW_RIDER', rider => {
-    const pos = { lat: +rider.lat, lng: +rider.lng };
-    const { key } = rider;
-    createUserMarkers(pos, key);
-  });
-  // jquery
-  // $('button').click(e => {
-  //   // e.preventDefault();
-  //   console.log('da click');
-  // });
 
-});
+  // handle direction with driver to rider
+  const directionsService = new google.maps.DirectionsService;
+  const directionsDisplay = new google.maps.DirectionsRenderer;
+
+  function calculateAndDisplayRoute(vehiclePosMarker , userPosMarker) {
+    directionsDisplay.setMap(map);
+    directionsDisplay.setOptions({suppressMarkers: true});
+    directionsService.route({
+      origin: vehiclePosMarker.getPosition(),
+      destination: userPosMarker.getPosition(),
+      travelMode: 'DRIVING'
+    }, (resp, status) => {
+      if (status !== 'OK') return swal("Fail","Directions request failed due to " + status,"error");
+      directionsDisplay.setDirections(resp);
+      // console.log(resp);
+      const lengths = resp.routes[0].legs[0].steps[1].distance.text;
+      const times = resp.routes[0].legs[0].steps[1].duration.text;
+      const middle = resp.routes[0].legs[0].steps.length/2;
+      const pos = resp.routes[0].legs[0].steps[1].end_location;
+      const content = `<div class="show">
+      <label id="lengths">${lengths}</label><br/><label>${times}</label></div>`;
+      const info = new google.maps.InfoWindow({content});
+      info.setPosition(pos);
+      info.open(map);
+      map.addListener('click', () => info.close());
+    });
+  } // end handle direction
+  
+
+});// end wrap function
