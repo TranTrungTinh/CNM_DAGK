@@ -5,7 +5,7 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
 // import my function
-const Driver = require('./model/Driver');
+// const drivers = require('./model/Driver');
 const db = require('./model/fbConfig');
 
 // settup static
@@ -19,13 +19,29 @@ server.listen(4000, () => console.log('Server has been started!'));
 
 // socket.io
 io.on('connection' , socket => {
-    io.emit('LIST_RIDER' , Driver.getAllRider());
+    
+    // gui danh sach xe    
+    db().ref('cars').once('value')
+    .then(cars => {
+        const arrDrivers = [];
+        cars.forEach( e => { arrDrivers.push({ id: e.key , ...e.val() }) });
+        io.emit('LIST_DRIVER' , arrDrivers);
+        // console.log(arrDrivers);
+    })
+    .catch(err => console.log(err.message));
+    
 
     // realtime child_added
     db().ref('users').on('child_added' , user => {
         // console.log(user.key , user.val());
-        if(!user.val().state) return;
+        const {state} = user.val();
+        if(!state) return 0;
         const rider = {key: user.key, ...user.val()};
         io.emit('NEW_RIDER', rider); 
+    });
+
+    // selected driver
+    socket.on('CLIENT_SELECTED_DRIVER', driver => {
+        console.log(driver);
     });
 });

@@ -15,13 +15,8 @@ app.get('/', (req , res) => res.render('home'));
 app.post('/order' , parser , (req , res) => {
     const {phone ,address ,lat ,lng ,bike ,other ,state} = req.body;
     if(!phone) res.send({error: error.message});
-    // console.log(phone , lat , lng , bike , other);
     db().ref('users').push({phone ,address ,lat ,lng ,bike ,other ,state});
     res.send({message: 'OK'});
 });
 app.listen(3000, () => console.log('Server has been started!'));
 
-// server.listen(3000, () => console.log('Server has been started!'));
-// io.on('connection' , socket => {
-//     // to do
-// });
