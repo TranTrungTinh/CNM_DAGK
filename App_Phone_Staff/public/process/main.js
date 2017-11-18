@@ -6,10 +6,12 @@ $('#btn_order').click(e => {
     const phone = $('#phone').val();
     const otherDetails = $('#otherDetails').val() || '';
     const vehicle = $('input[id=bike]:checked').val() ? true : false; // true: bike , flase: car
+    const address = $('#address').val();
     if(phone === '') return swal("Loi","Chua nhap so dien thoai","error");    
     if(!userLat) return swal("Canh bao","Vui long chon dia chi","warning");
     const order = {
         phone: phone,
+        address: address,
         lat: userLat,
         lng: userLng,
         other: otherDetails,

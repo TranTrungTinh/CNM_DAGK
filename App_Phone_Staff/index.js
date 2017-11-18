@@ -13,10 +13,10 @@ app.use(express.static('public'));
 
 app.get('/', (req , res) => res.render('home'));
 app.post('/order' , parser , (req , res) => {
-    const {phone , lat , lng , bike , other , state} = req.body;
+    const {phone ,address ,lat ,lng ,bike ,other ,state} = req.body;
     if(!phone) res.send({error: error.message});
     // console.log(phone , lat , lng , bike , other);
-    db().ref('users').push({phone , lat , lng , bike , other , state});
+    db().ref('users').push({phone ,address ,lat ,lng ,bike ,other ,state});
     res.send({message: 'OK'});
 });
 app.listen(3000, () => console.log('Server has been started!'));

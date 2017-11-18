@@ -188,8 +188,8 @@ $(function() {
   });
   socket.on('NEW_RIDER', rider => {
     const pos = { lat: +rider.lat, lng: +rider.lng };
-    const { key } = rider;
-    createUserMarkers(pos, key);
+    const { key , phone , address } = rider;
+    createUserMarkers(pos, { key,phone,address });
   });
 
 
@@ -209,13 +209,24 @@ $(function() {
     arrVehicle.push(newMarker);
   }
 
-  function createUserMarkers(pos, key) {
-    const content = `<div>
-      <button type="button" class="btn btn-outline-danger" id="${key}">Call Driver</button></div>`;
-    const info = new google.maps.InfoWindow({
+  function createUserMarkers(pos, data) {
+    const {key,phone,address} = data;
+    const content = `
+    <div class="info-box-wrap">
+      <img src="./resources/rider.png" />
+      <div class="info-box-text-wrap">
+        <h6 class="address">${phone}</h6>
+        <p class="price">${address}</p>
+      </div>
+      <div class="action-btns">
+        <button type="button" class="btn btn-outline-danger btn-sm" id="${key}">Call Driver</button>
+      </div>
+    </div>`;
+    const ibOptions = {
       content,
-      maxWidth: 100
-    });
+      maxWidth: 300
+    };
+    const info = new google.maps.InfoWindow(ibOptions);
     const riderMarker = new google.maps.Marker({
       position: pos,
       map: map,
