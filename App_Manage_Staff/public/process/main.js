@@ -169,8 +169,15 @@ $(function() {
   };
   const wattingRiders = [];
   const selectedRiders = [];
+
   // create map
   const map = new google.maps.Map(mapDiv, mapOptions);
+
+  // direction maps
+  const directionsService = new google.maps.DirectionsService;
+  const directionsDisplay = new google.maps.DirectionsRenderer;
+
+  // socket.io
   const socket = io();
   socket.on('SEND_LIST_USERS' , rider => {
     const {state } = rider;
@@ -181,6 +188,7 @@ $(function() {
     createSelectedContent(rider);
   });
 
+  // handle user watting car
   function createWaitingContent(rider) {
     const {id , phone , address} = rider;
     const content = `
@@ -195,6 +203,7 @@ $(function() {
     wattingRiders.push(rider);
   }
 
+  //handle user is picked up by driver
   function createSelectedContent(rider) {
     const {id , phone , address , driver} = rider;
     const {name} = driver;
@@ -231,18 +240,101 @@ $(function() {
     $(`#${driver.id}111`).on('click', e => {
       e.preventDefault();
       // show direction on map
-      
+      showDirection(driver , rider);
     });
 
     $(`#${driver.id}222`).on('click', e => {
       e.preventDefault();
       // update cars and save history
+      // B1: delete data in array
+      const index = selectedRiders.findIndex(e => e.id == driver.id);
+      selectedRiders.splice(index , 1);
       
+      // B2: remove element in UI
+      $(`#${driver.id}`).remove();
+
+      // B3: update database
+      socket.emit('UPDATE_HISTORY' , rider);
     });
-    console.log('241');
+    
   }
-  
-  // console.log(wattingRiders);
-  // console.log(selectedRiders);
+
+  // handle show direction on maps 
+  function showDirection(driver , rider) {
+    const {phone , address} = rider;
+    const {name} = driver;
+    const pos_driver = {lat: +driver.lat, lng: +driver.lng};
+    const pos_rider = {lat: +rider.lat, lng: +rider.lng};
+    const contentRider = `
+    <div class="info-box-wrap">
+      <img src="./resources/user_profile.png" />
+      <div class="info-box-text-wrap">
+        <h6 class="address">${phone}</h6>
+        <p class="price">${address}</p>
+      </div>
+    </div>`;
+    const infoRider = new google.maps.InfoWindow({content: contentRider });
+    const riderMarker = new google.maps.Marker({
+      position: pos_rider,
+      map: map,
+      icon: './resources/user_false.png',
+      title: 'Rider is waiting the diver'
+    });
+    const contentDriver = `
+    <div class="info-box-wrap">
+      <img src="./resources/driver_profile.png" />
+      <div class="info-box-text-wrap">
+        <h6 class="address">${name}</h6>
+      </div>
+    </div>`;
+    const infoDriver = new google.maps.InfoWindow({content: contentDriver });
+    const driverMarker = new google.maps.Marker({
+      position: pos_driver,
+      map: map,
+      icon: './resources/car_blue.png',
+      title: 'This is the vehicle'
+    });
+
+    infoRider.open(map , riderMarker);
+    infoDriver.open(map , driverMarker);
+
+    calculateAndDisplayRoute(driverMarker , riderMarker);
+    map.addListener('click', () => {
+      infoRider.close();
+      infoDriver.close();
+    });
+  } // end handle show direction
+
+  // handle direction
+  function calculateAndDisplayRoute(vehiclePosMarker , userPosMarker) {
+    directionsDisplay.setMap(null);
+
+    directionsDisplay.setMap(map);
+    directionsDisplay.setOptions({
+      suppressMarkers: true,
+      polylineOptions: {
+        strokeColor: '#16a085'
+      }
+    });
+    directionsService.route({
+      origin: vehiclePosMarker.getPosition(),
+      destination: userPosMarker.getPosition(),
+      travelMode: 'DRIVING'
+    }, (resp, status) => {
+      if (status !== 'OK') return swal("Fail","Directions request failed due to " + status,"error");
+      directionsDisplay.setDirections(resp);
+      // console.log(resp);
+      const lengths = resp.routes[0].legs[0].steps[1].distance.text;
+      const times = resp.routes[0].legs[0].steps[1].duration.text;
+      // const middle = resp.routes[0].legs[0].steps.length/2;
+      const pos = resp.routes[0].legs[0].steps[1].end_location;
+      const content = `<div class="show">
+      <label id="lengths">${lengths}</label><br/><label>${times}</label></div>`;
+      const info = new google.maps.InfoWindow({content});
+      info.setPosition(pos);
+      info.open(map);
+      setTimeout(() => info.close(),4000);
+    });
+  } // end handle direction
   
 });

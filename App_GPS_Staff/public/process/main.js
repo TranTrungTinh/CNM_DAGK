@@ -7,6 +7,7 @@ $(function() {
   // direction maps
   const directionsService = new google.maps.DirectionsService;
   const directionsDisplay = new google.maps.DirectionsRenderer;
+  
   // set defaut map first run
   const mapDiv = document.getElementById('map');
   const myLocation = new google.maps.LatLng(10.8230989, 106.6296638);
@@ -194,16 +195,24 @@ $(function() {
     const { key , phone , address } = rider;
     createUserMarkers(pos, {key , phone , address});
   });
-  //
+
+  // update state in UI hidden car if true
   socket.on('DRIVER_BUSY', data => {
     // remove rider and driver marker
     const {driverKey , riderKey} = data
     const rider = arrRider.find(e => e.id == riderKey);
     const driver = arrVehicle.find(e => e.driver.id == driverKey);
-    console.log(rider , driver);
+    // console.log(rider , driver);
     rider.pos.setMap(null);
     driver.pos.setMap(null);
   });
+
+  // update state in UI show car if false
+  socket.on('UPDATE_CAR' , driver => {
+    createVehicleMarkers(driver);
+  });
+
+
 
   /* -------------------------------------------------------------- */
   // create marker
@@ -288,6 +297,9 @@ $(function() {
             selectedCar.vehicle.setMap(null);
             riderMarker.setMap(null);
             directionsDisplay.setMap(null);
+
+            // da tim thay xe cho khach
+            socket.emit('CLIENT_SELECTED_DRIVER', {driver: selectedCar.data, userKey: key});
           }, 5000);
 
 
@@ -296,9 +308,6 @@ $(function() {
           const index = arrVehicle.findIndex(e => e.pos.getPosition().lat() === lat_Car);
           arrVehicle.splice(index,1);
 
-          // da tim thay xe cho khach
-          socket.emit('CLIENT_SELECTED_DRIVER', {driver: selectedCar.data, userKey: key});
-          
           info.close();
       });
     });

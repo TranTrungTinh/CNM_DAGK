@@ -28,4 +28,14 @@ io.on('connection' , socket => {
     const rider = {id: user.key , ...user.val()};
     socket.emit('SEND_LIST_USERS' , rider);
   });
+
+  socket.on('UPDATE_HISTORY' , rider => {
+    const {id , driver} = rider;
+    //B1: remove users with id
+    db().ref(`users/${id}`).remove();
+    //B2: update cars with id
+    db().ref(`cars/${driver.id}`).update({state: false});
+    //B3: insert history database
+    db().ref('history').push(rider);
+  });
 });

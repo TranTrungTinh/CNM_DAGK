@@ -15,7 +15,7 @@ app.use(express.static('public'));
 
 // router
 app.get('/', (req, res) => res.render('home'));
-server.listen(4000, () => console.log('Server has been started!'));
+server.listen(4000, () => console.log('Server has been started port 4000!'));
 
 // socket.io
 io.on('connection' , socket => {
@@ -26,10 +26,7 @@ io.on('connection' , socket => {
         const arrDrivers = [];
         cars.forEach( e => { 
             const {state} = e.val();
-            if(state) {
-                console.log(e.key);
-                return;
-            }
+            if(state) return;
             arrDrivers.push({ id: e.key , ...e.val()}); 
         });
         socket.emit('LIST_DRIVER' , arrDrivers);
@@ -60,4 +57,14 @@ io.on('connection' , socket => {
         
     });
 
+    // when cars update state === false
+    db().ref('cars').on('child_changed' , car => {
+        const {state} = car.val();
+        // console.log(state);
+        if(!state){
+            const driver = {id: car.key, ...car.val()};
+            // console.log(driver);
+            io.emit('UPDATE_CAR' , driver);
+        }
+    });
 });
