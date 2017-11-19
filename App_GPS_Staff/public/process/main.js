@@ -1,8 +1,12 @@
 $(function() {
   let curentWindow = false; // toggle window info
-  const arrVehicle = [];
-  const arrRider = [];
-  const arrCacheData = [];
+  const arrVehicle = []; // store position and data driver
+  const arrRider = []; // store position and data rider
+  const arrCacheData = []; // store cache position rider and position driver
+
+  // direction maps
+  const directionsService = new google.maps.DirectionsService;
+  const directionsDisplay = new google.maps.DirectionsRenderer;
   // set defaut map first run
   const mapDiv = document.getElementById('map');
   const myLocation = new google.maps.LatLng(10.8230989, 106.6296638);
@@ -178,20 +182,28 @@ $(function() {
   /* -------------------------------------------------------------- */
 
 
-  // socket.io
+  // ----------socket.io
+  // listen array driver first connection
   const socket = io();
   socket.on('LIST_DRIVER', arrDrivers => {
     arrDrivers.forEach(driver => createVehicleMarkers(driver));
   });
+  // listen new rider when another one order car (App_Phone_Staff click order)
   socket.on('NEW_RIDER', rider => {
     const pos = { lat: +rider.lat, lng: +rider.lng };
     const { key , phone , address } = rider;
-    createUserMarkers(pos, { key,phone,address });
+    createUserMarkers(pos, {key , phone , address});
   });
-
-
-
-
+  //
+  socket.on('DRIVER_BUSY', data => {
+    // remove rider and driver marker
+    const {driverKey , riderKey} = data
+    const rider = arrRider.find(e => e.id == riderKey);
+    const driver = arrVehicle.find(e => e.driver.id == driverKey);
+    console.log(rider , driver);
+    rider.pos.setMap(null);
+    driver.pos.setMap(null);
+  });
 
   /* -------------------------------------------------------------- */
   // create marker
@@ -228,6 +240,8 @@ $(function() {
       icon: './resources/user_false.png',
       title: 'Rider is waiting the diver'
     });
+    // add array
+    arrRider.push({id: key , pos: riderMarker });
 
     // handle event click rider
     riderMarker.addListener('click', () => {
@@ -262,21 +276,29 @@ $(function() {
           const selectedCar = arrDistance.sort((a,b) => a.distance - b.distance)[0];
           // display route in map
           selectedCar.vehicle.setIcon('./resources/bike_red.png');
+          riderMarker.setIcon('./resources/user_true.png');
           calculateAndDisplayRoute(selectedCar.vehicle , riderMarker);
 
           // cache data to improve performent
           const cacheData = {driver: selectedCar.vehicle,rider: riderMarker,id: key};
           arrCacheData.push(cacheData);
 
+          // remove marker user and car in Maps
+          setTimeout(() => {
+            selectedCar.vehicle.setMap(null);
+            riderMarker.setMap(null);
+            directionsDisplay.setMap(null);
+          }, 5000);
+
+
           //delete data from cache
           const lat_Car = cacheData.driver.getPosition().lat();
           const index = arrVehicle.findIndex(e => e.pos.getPosition().lat() === lat_Car);
           arrVehicle.splice(index,1);
-          console.log(arrCacheData);
-          // console.log(arrVehicle);
+
           // da tim thay xe cho khach
-          // socket.emit('CLIENT_SELECTED_DRIVER', {driver: selectedCar.data, userKey: key});
-          // console.log(selectedCar.data);
+          socket.emit('CLIENT_SELECTED_DRIVER', {driver: selectedCar.data, userKey: key});
+          
           info.close();
       });
     });
@@ -285,12 +307,14 @@ $(function() {
 
 
   // handle direction with driver to rider
-  const directionsService = new google.maps.DirectionsService;
-  const directionsDisplay = new google.maps.DirectionsRenderer;
-
   function calculateAndDisplayRoute(vehiclePosMarker , userPosMarker) {
     directionsDisplay.setMap(map);
-    directionsDisplay.setOptions({suppressMarkers: true});
+    directionsDisplay.setOptions({
+      suppressMarkers: true,
+      polylineOptions: {
+        strokeColor: '#8e44ad'
+      }
+    });
     directionsService.route({
       origin: vehiclePosMarker.getPosition(),
       destination: userPosMarker.getPosition(),
@@ -308,7 +332,7 @@ $(function() {
       const info = new google.maps.InfoWindow({content});
       info.setPosition(pos);
       info.open(map);
-      map.addListener('click', () => info.close());
+      setTimeout(() => info.close(),4000);
     });
   } // end handle direction
   

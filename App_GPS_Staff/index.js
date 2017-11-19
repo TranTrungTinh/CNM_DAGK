@@ -24,8 +24,15 @@ io.on('connection' , socket => {
     db().ref('cars').once('value')
     .then(cars => {
         const arrDrivers = [];
-        cars.forEach( e => { arrDrivers.push({ id: e.key , ...e.val() }) });
-        io.emit('LIST_DRIVER' , arrDrivers);
+        cars.forEach( e => { 
+            const {state} = e.val();
+            if(state) {
+                console.log(e.key);
+                return;
+            }
+            arrDrivers.push({ id: e.key , ...e.val()}); 
+        });
+        socket.emit('LIST_DRIVER' , arrDrivers);
         // console.log(arrDrivers);
     })
     .catch(err => console.log(err.message));
@@ -37,11 +44,20 @@ io.on('connection' , socket => {
         const {state} = user.val();
         if(!state) return 0;
         const rider = {key: user.key, ...user.val()};
-        io.emit('NEW_RIDER', rider); 
+        socket.emit('NEW_RIDER', rider); 
     });
 
     // selected driver
-    socket.on('CLIENT_SELECTED_DRIVER', driver => {
-        console.log(driver);
+    socket.on('CLIENT_SELECTED_DRIVER', driverdata => {
+        // console.log(driver);
+        const {userKey, driver} = driverdata;
+        db().ref(`users/${userKey}`).update({ driver, state: "" });
+        db().ref(`cars/${driver.id}`).update({state: true});
+
+        // send busy driver
+        const busyDriver = {driverKey: driver.id, riderKey: userKey}
+        socket.broadcast.emit('DRIVER_BUSY', busyDriver);
+        
     });
+
 });
