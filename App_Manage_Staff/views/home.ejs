@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <base href="../">
+    <head>
+        <title>App Quan Ly Trang Thai</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="./css/styles.css" >
+        <link rel="stylesheet" href="./css/bootstrap.min.css">
+        
+        <script src="./js/jquery.js"></script>
+        <script src="./js/sweet.js"></script>      
+        <script src="socket.io/socket.io.js"></script>
+    </head>
+    <body>
+    <div class="wrapper_container container">
+        <div class="header">MANEGER CAR</div>
+        <div>
+            <div class="row box">
+                <div class="col title">
+                    <img src="./resources/user_time.png" alt="" class="image" />
+                    <p>Users are waiting the car</p>
+                </div>
+                <div class="col title">
+                    <img src="./resources/car_pickup.png" alt="" class="image" />
+                    <p>Users have been already picked up</p>
+                </div>
+            </div>
+            <div class="row">
+            <div class="waiting_container col">
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action list-group-item-light">
+                        <img src="./resources/user_profile.png" alt="" />
+                        <div class="wrapper_profile">
+                            <h6>0972258138</h6>
+                            <p>227 nguyen van cu phuong 12 quan 5 thanh pho ho chi minh</p>
+                        </div>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action list-group-item-light">
+                        <img src="./resources/user_profile.png" alt="" />
+                        <div class="wrapper_profile">
+                            <h6>0945634634</h6>
+                            <p>ben xe quan 8, ta quang buu, thanh pho ho chi minh</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+                <div class="selected_container col">
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action list-group-item-warning">
+                        <img src="./resources/user_profile.png" alt="" />
+                        <div class="wrapper_profile">
+                            <h6>0972258138</h6>
+                            <p>227 nguyen van cu phuong 12 quan 5 thanh pho ho chi minh</p>
+                        </div>
+                        <div class="wrapper_profile_driver">
+                            <img src="./resources/taxi.png" alt="" />
+                            <h6>Tran Thanh Nhan</h6>
+                        </div>
+                        <div class="action-btns d-flex flex-row-reverse">
+                            <button type="button" class="btn btn-outline-danger btn-sm" id="key">Show</button>
+                            <button type="button" class="btn btn-outline-success btn-sm" id="key">Success</button>
+                        </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="map"></div>
+    </div>    
+    <script src="https://maps.googleapis.com/maps/api/js?v3&key=AIzaSyAIla57DU_N_8Lzo1nXmePnghTu-60KTfQ&libraries=geometry"></script>
+    <script src="./process/main.js"></script>
+    </body>
+</html>
