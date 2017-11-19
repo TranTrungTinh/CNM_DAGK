@@ -1,8 +1,6 @@
 const express = require('express');
 const parser = require('body-parser').urlencoded({extended: false});
 const app = express();
-// const server = require('http').Server();
-// const io = require('socket.io')(server);
 
 // config data base
 const db = require('./model/fbConfig');
