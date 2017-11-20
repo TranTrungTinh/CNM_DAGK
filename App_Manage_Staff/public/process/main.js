@@ -177,6 +177,12 @@ $(function() {
   const directionsService = new google.maps.DirectionsService;
   const directionsDisplay = new google.maps.DirectionsRenderer;
 
+  // older marker
+  // let olderDriverMarker = null;
+  // let olderRiderMarker = null;
+  // let olderInfoDriver = null;
+  // let olderInfoRider = null;
+
   // socket.io
   const socket = io();
   socket.on('SEND_LIST_USERS' , rider => {
@@ -258,7 +264,14 @@ $(function() {
     });
     
   }
-
+  //
+  function hidden(driverMarker , riderMarker , infoDriver , infoRider){
+    driverMarker.setMap(null);
+    riderMarker.setMap(null);
+    infoRider.close();
+    infoDriver.close();
+    directionsDisplay.setMap(null);
+  }
   // handle show direction on maps 
   function showDirection(driver , rider) {
     const {phone , address} = rider;
@@ -294,21 +307,29 @@ $(function() {
       icon: './resources/car_blue.png',
       title: 'This is the vehicle'
     });
+    
+    // if(olderDriverMarker) {
+    //   hidden(olderDriverMarker , olderRiderMarker , olderDriverMarker , olderInfoRider);
+    // }
+    // // set older marker
+    // olderDriverMarker = driverMarker;
+    // olderRiderMarker = riderMarker;
+    // olderInfoDriver = infoDriver;
+    // olderInfoRider = infoRider;
 
+    // show infowindow
     infoRider.open(map , riderMarker);
     infoDriver.open(map , driverMarker);
 
     calculateAndDisplayRoute(driverMarker , riderMarker);
-    map.addListener('click', () => {
-      infoRider.close();
-      infoDriver.close();
-    });
+    map.addListener('click', () => 
+      hidden(driverMarker , riderMarker , infoDriver , infoRider)
+    );
   } // end handle show direction
 
   // handle direction
   function calculateAndDisplayRoute(vehiclePosMarker , userPosMarker) {
-    directionsDisplay.setMap(null);
-
+    
     directionsDisplay.setMap(map);
     directionsDisplay.setOptions({
       suppressMarkers: true,
@@ -323,17 +344,6 @@ $(function() {
     }, (resp, status) => {
       if (status !== 'OK') return swal("Fail","Directions request failed due to " + status,"error");
       directionsDisplay.setDirections(resp);
-      // console.log(resp);
-      const lengths = resp.routes[0].legs[0].steps[1].distance.text;
-      const times = resp.routes[0].legs[0].steps[1].duration.text;
-      // const middle = resp.routes[0].legs[0].steps.length/2;
-      const pos = resp.routes[0].legs[0].steps[1].end_location;
-      const content = `<div class="show">
-      <label id="lengths">${lengths}</label><br/><label>${times}</label></div>`;
-      const info = new google.maps.InfoWindow({content});
-      info.setPosition(pos);
-      info.open(map);
-      setTimeout(() => info.close(),4000);
     });
   } // end handle direction
   

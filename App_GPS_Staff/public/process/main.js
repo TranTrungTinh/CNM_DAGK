@@ -208,10 +208,7 @@ $(function() {
   });
 
   // update state in UI show car if false
-  socket.on('UPDATE_CAR' , driver => {
-    createVehicleMarkers(driver);
-  });
-
+  socket.on('UPDATE_CAR' , driver => createVehicleMarkers(driver));
 
 
   /* -------------------------------------------------------------- */
@@ -222,7 +219,7 @@ $(function() {
       position: pos,
       map: map,
       animation: google.maps.Animation.DROP,
-      icon: './resources/bike_blue.png',
+      icon: './resources/car_blue.png',
       title: 'This is the vehicle'
     });
     arrVehicle.push({pos: newDriverMarker, driver});
@@ -284,7 +281,7 @@ $(function() {
          
           const selectedCar = arrDistance.sort((a,b) => a.distance - b.distance)[0];
           // display route in map
-          selectedCar.vehicle.setIcon('./resources/bike_red.png');
+          selectedCar.vehicle.setIcon('./resources/car_red.png');
           riderMarker.setIcon('./resources/user_true.png');
           calculateAndDisplayRoute(selectedCar.vehicle , riderMarker);
 

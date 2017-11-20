@@ -1,14 +1,28 @@
 let userLat = null; // kinh do nguoi dung
 let userLng = null; // vi do nguoi dung
+// check phone number
+$('#phone').blur(() => {
+    const phone = $('#phone').val();
+    if(phone === '') return $('#phone').focus();
+    if(isNaN(+phone)) return swal({
+        title: "WARNING",
+        text: "Vui long chi nhap so!",
+        icon: "warning"
+    }).then(() => {
+        $('#phone').val('');
+        $('#phone').focus();
+    });
+    $('#address').focus();
+    
+});
 
 $('#btn_order').click(e => {
     e.preventDefault();
     const phone = $('#phone').val();
     const otherDetails = $('#otherDetails').val() || '';
     const vehicle = $('input[id=bike]:checked').val() ? true : false; // true: bike , flase: car
-    const address = $('#address').val();
-    if(phone === '') return swal("Loi","Chua nhap so dien thoai","error");    
-    if(!userLat) return swal("Canh bao","Vui long chon dia chi","warning");
+    const address = $('#address').val();    
+    if(!userLat) return swal("WARNING","Vui long chon dia chi","warning");
     const order = {
         phone: phone,
         address: address,
@@ -19,7 +33,7 @@ $('#btn_order').click(e => {
         state: false  // chua duoc xe xac nhan
     }
     $.post('/order', order , result => {
-        if(result.message) return swal("Thanh cong","Order thanh cong","success");
+        if(result.message) return swal("SUCCESS","Order thanh cong","success");
         swal("That bai","Vui long thu lai","error");
     });
     $('#phone').val('');

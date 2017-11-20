@@ -30,7 +30,6 @@ io.on('connection' , socket => {
             arrDrivers.push({ id: e.key , ...e.val()}); 
         });
         socket.emit('LIST_DRIVER' , arrDrivers);
-        // console.log(arrDrivers);
     })
     .catch(err => console.log(err.message));
     
@@ -46,7 +45,7 @@ io.on('connection' , socket => {
 
     // selected driver
     socket.on('CLIENT_SELECTED_DRIVER', driverdata => {
-        // console.log(driver);
+        // update driver
         const {userKey, driver} = driverdata;
         db().ref(`users/${userKey}`).update({ driver, state: "" });
         db().ref(`cars/${driver.id}`).update({state: true});
@@ -63,8 +62,9 @@ io.on('connection' , socket => {
         // console.log(state);
         if(!state){
             const driver = {id: car.key, ...car.val()};
-            // console.log(driver);
-            io.emit('UPDATE_CAR' , driver);
+            socket.emit('UPDATE_CAR' , driver);
+            return;
         }
+        return;
     });
 });

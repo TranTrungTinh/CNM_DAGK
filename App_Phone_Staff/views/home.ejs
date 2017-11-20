@@ -16,22 +16,22 @@
     <body>
     <div id="wrap_container">
         <div id="header">
-            <h1>Welcome to web app order car</h1>
+            <h1>MANAGE ORDER CAR</h1>
         </div>
         <div id="order_container">
             <label for="InputPhone">Phone Number</label>
-            <input class="form-control" type="text" id="phone" placeholder="Input phone number">
+            <input class="form-control" type="text" id="phone" placeholder="Enter phone number" maxlength="11">
             <label for="InputAddress">Address Pickup</label>
-            <input class="form-control " type="text" id="address" placeholder="Input Address">
+            <input class="form-control " type="text" id="address" placeholder="Enter address">
             <label for="TexareaOther">Other details</label>
-            <textarea class="form-control " rows="3" placeholder="Other details" id="otherDetails"></textarea>
+            <textarea class="form-control " rows="3" placeholder="Enter other details" id="otherDetails"></textarea>
             <div class="cc-selector">
                 <input id="bike" type="radio" name="vehicle" value="bike" checked="checked" />
                 <label class="drinkcard-cc bike" for="bike"></label>
                 <input id="car" type="radio" name="vehicle" value="car" />
                 <label class="drinkcard-cc car"for="car"></label>
             </div>
-            <button type="button" class="btn btn-danger btn-lg btn-block" id="btn_order">Order Car</button>
+            <button type="button" class="btn btn-danger btn-lg btn-block" id="btn_order">Set vehicles</button>
         </div>
         <div id="history_container">
             <textarea class="form-control" rows="10" placeholder="History Order Car" readonly></textarea>
