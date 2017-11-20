@@ -20,11 +20,23 @@ app.use(cookieParser());
 
 app.get('/', (req , res) => res.render('home'));
 app.post('/order' , parser , (req , res) => {
-    const {phone ,address ,lat ,lng ,bike ,other ,state} = req.body;
-    if(!phone) res.send({error: error.message});
-    
-
-    db().ref('users').push({phone ,address ,lat ,lng ,bike ,other ,state});
+    const {phone , address , lat , lng , bike , other} = req.body;
+    const orderHistory = histories.filter(e => e.address == address);
+    if(!orderHistory[0]) {
+        const {state} = req.body;
+        if(!phone) res.send({error: error.message});
+        db().ref('users').push({phone , address ,lat ,lng ,bike ,other ,state});
+    }else{
+        // console.log('cap nhat lai lich su' ,orderHistory[0] );
+        const {id} = orderHistory[0];
+        //B1: Xoa lich su cu
+        db().ref(`history/${id}`).remove();
+        //B2: Them user mo
+        const { driver , state } = orderHistory[0];
+        db().ref('users').push({phone,address,lat,lng,bike,other,state,driver});
+        //B3: Update trang thai xe
+        db().ref(`cars/${driver.id}`).update({state: true});
+    }
     res.send({message: 'OK'});
 });
 app.post('/history' , parser , (req , res) => {
@@ -48,10 +60,10 @@ app.get('/renewtoken', middle.isLogin , (req , res) => {
 });
 
 
-app.listen(3000, () => console.log('Server has been started!'));
+app.listen(3000, () => console.log('Server has been started port 3000!'));
 
 // listen data update
 db().ref('history').on('child_added' , data => {
-    const history = {id: data.key , ...data.val()};
+    const history = {...data.val() , id: data.key};
     histories.push(history);
 });

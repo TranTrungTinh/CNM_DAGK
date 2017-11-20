@@ -209,7 +209,13 @@ $(function() {
 
   // update state in UI show car if false
   socket.on('UPDATE_CAR' , driver => createVehicleMarkers(driver));
-
+  // remove marker car in UI
+  socket.on('REMOVE_CAR' , driver => {
+    const {id} = driver;
+    const removeDriver = arrVehicle.find(e => e.driver.id == id);
+    if(!removeDriver) return;
+    removeDriver.pos.setMap(null);
+  });
 
   /* -------------------------------------------------------------- */
   // create marker

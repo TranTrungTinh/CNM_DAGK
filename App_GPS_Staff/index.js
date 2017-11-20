@@ -45,11 +45,12 @@ io.on('connection' , socket => {
 
     // selected driver
     socket.on('CLIENT_SELECTED_DRIVER', driverdata => {
+
         // update driver
         const {userKey, driver} = driverdata;
-        db().ref(`users/${userKey}`).update({ driver, state: "" });
         db().ref(`cars/${driver.id}`).update({state: true});
-
+        db().ref(`users/${userKey}`).update({ driver, state: "" });
+        
         // send busy driver
         const busyDriver = {driverKey: driver.id, riderKey: userKey}
         socket.broadcast.emit('DRIVER_BUSY', busyDriver);
@@ -59,12 +60,12 @@ io.on('connection' , socket => {
     // when cars update state === false
     db().ref('cars').on('child_changed' , car => {
         const {state} = car.val();
-        // console.log(state);
+        const driver = {id: car.key, ...car.val()};
         if(!state){
-            const driver = {id: car.key, ...car.val()};
             socket.emit('UPDATE_CAR' , driver);
             return;
         }
-        return;
+        socket.emit('REMOVE_CAR' , driver);
+        return;     
     });
 });
