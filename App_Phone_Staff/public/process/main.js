@@ -1,19 +1,36 @@
 let userLat = null; // kinh do nguoi dung
 let userLng = null; // vi do nguoi dung
+
+$('#manage_order').hide(0);
+// $('#sign_in_container').show();
+
+
 // check phone number
 $('#phone').blur(() => {
     const phone = $('#phone').val();
     if(phone === '') return $('#phone').focus();
     if(isNaN(+phone)) return swal({
         title: "WARNING",
-        text: "Vui long chi nhap so!",
+        text: "Chỉ nhập số !!!",
         icon: "warning"
     }).then(() => {
         $('#phone').val('');
         $('#phone').focus();
     });
-    $('#address').focus();
-    
+    $.post('/history' , {phone} , resp => {
+        $('.list-group').html('');
+        if(resp.message) {
+            const {history} = resp;
+            history.forEach(e => {
+               const content = `<li class="list-group-item list-group-item-info">${e.address}</li>`; 
+               $('.list-group').append(content);             
+            });
+        }else {
+            const content = `<li class="list-group-item list-group-item-info">This phone isn't hitories</li>`; 
+            $('.list-group').append(content);
+        }
+        $('#address').focus();
+    });
 });
 
 $('#btn_order').click(e => {
@@ -22,7 +39,7 @@ $('#btn_order').click(e => {
     const otherDetails = $('#otherDetails').val() || '';
     const vehicle = $('input[id=bike]:checked').val() ? true : false; // true: bike , flase: car
     const address = $('#address').val();    
-    if(!userLat) return swal("WARNING","Vui long chon dia chi","warning");
+    if(!userLat) return swal("WARNING","Vui lòng chọn địa chỉ","warning");
     const order = {
         phone: phone,
         address: address,
@@ -32,9 +49,9 @@ $('#btn_order').click(e => {
         bike: vehicle,
         state: false  // chua duoc xe xac nhan
     }
-    $.post('/order', order , result => {
-        if(result.message) return swal("SUCCESS","Order thanh cong","success");
-        swal("That bai","Vui long thu lai","error");
+    $.post('/order', order , resp => {
+        if(resp.message) return swal("SUCCESS","Đặt xe thành công","success");
+        swal("FAIL","Try again!!!","error");
     });
     $('#phone').val('');
     $('#otherDetails').val('');
@@ -47,7 +64,7 @@ function autoComplete() {
 
     searchBox.addListener('places_changed', () => {
         const places = searchBox.getPlaces();  
-        if (places.length == 0) return swal("Dia chi sai" , "Vui long nhap dung dia chi" , "error");
+        if (places.length == 0) return swal("FAIL" , "Vui lòng nhập đúng địa chỉ" , "error");
         const userAddress = places[0].formatted_address;
         // resquest google maps javascript api to get lat & lng
         $.get('https://maps.googleapis.com/maps/api/geocode/json', {

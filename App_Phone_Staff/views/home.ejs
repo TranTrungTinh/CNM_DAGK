@@ -9,8 +9,7 @@
         <link rel="stylesheet" href="./css/bootstrap.min.css">
         
         <script src="./js/jquery.js"></script>
-        <script src="./js/sweet.js"></script>
-        <script src="./js/axios.js"></script>        
+        <script src="./js/sweet.js"></script>       
               
     </head>
     <body>
@@ -18,23 +17,38 @@
         <div id="header">
             <h1>MANAGE ORDER CAR</h1>
         </div>
-        <div id="order_container">
-            <label for="InputPhone">Phone Number</label>
-            <input class="form-control" type="text" id="phone" placeholder="Enter phone number" maxlength="11">
-            <label for="InputAddress">Address Pickup</label>
-            <input class="form-control " type="text" id="address" placeholder="Enter address">
-            <label for="TexareaOther">Other details</label>
-            <textarea class="form-control " rows="3" placeholder="Enter other details" id="otherDetails"></textarea>
-            <div class="cc-selector">
-                <input id="bike" type="radio" name="vehicle" value="bike" checked="checked" />
-                <label class="drinkcard-cc bike" for="bike"></label>
-                <input id="car" type="radio" name="vehicle" value="car" />
-                <label class="drinkcard-cc car"for="car"></label>
-            </div>
-            <button type="button" class="btn btn-danger btn-lg btn-block" id="btn_order">Set vehicles</button>
+        <div id="sign_in_container" class="form-group">
+            <label for="username">Username</label>
+            <input class="form-control" type="text" id="username" placeholder="Enter your username" maxlength="5">
+            <label for="password">Password</label>
+            <input class="form-control" type="password" id="passwrod" placeholder="Enter your password" maxlength="20">
+            <button type="button" class="btn btn-outline-success btn-sm btn-block">Sign In</button>
         </div>
-        <div id="history_container">
-            <textarea class="form-control" rows="10" placeholder="History Order Car" readonly></textarea>
+
+
+        <div id="manage_order">
+            <div id="order_container">
+                    <label for="InputPhone">Phone Number</label>
+                    <input class="form-control" type="text" id="phone" placeholder="Enter phone number" maxlength="11">
+                    <label for="InputAddress">Address Pickup</label>
+                    <input class="form-control " type="text" id="address" placeholder="Enter address">
+                    <label for="TexareaOther">Other details</label>
+                    <textarea class="form-control " rows="3" placeholder="Enter other details" id="otherDetails"></textarea>
+                    <div class="cc-selector">
+                        <input id="bike" type="radio" name="vehicle" value="bike" checked="checked" />
+                        <label class="drinkcard-cc bike" for="bike"></label>
+                        <input id="car" type="radio" name="vehicle" value="car" />
+                        <label class="drinkcard-cc car"for="car"></label>
+                    </div>
+                <button type="button" class="btn btn-outline-danger btn-lg btn-block" id="btn_order">BOOKING A CAR</button>
+            </div>
+            <div id="history_container">
+                <div id="history_title">
+                    <img src="./resources/history.png" alt="" />
+                    <p>Review history ordered car</p>
+                </div>
+                <ul class="list-group"></ul>
+            </div>
         </div>
     </div>
     <script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyAIla57DU_N_8Lzo1nXmePnghTu-60KTfQ&libraries=places&callback=autoComplete' async defer></script>    
