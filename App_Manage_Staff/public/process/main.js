@@ -1,4 +1,30 @@
 $(function() {
+  $.get('/renewtoken', resp => {
+    if(resp.error) {
+        $('#manage_content').hide();
+        $('#map').hide();
+        $('#sign_in_container').show();
+        return;
+    }
+    $('#sign_in_container').hide();
+    $('#manage_content').show();
+    $('#map').show();
+});
+
+$('#sign_in').click(e => {
+    e.preventDefault();
+    const username = $('#username').val() || '';
+    const password = $('#password').val() || '';
+    if(username == '' || password == '') return swal('WARNING','Chưa nhập username hoặc password','warning');
+
+    $.post('/signin' , {username , password} , resp => {
+        if(resp.error) return swal('FAIL','Sai tên tài khoản hoặc mật khẩu','error');
+        $('#sign_in_container').hide(1000);
+        $('#manage_content').show(1000);
+        $('#map').show(1000);
+    });
+});
+
   const mapDiv = document.getElementById('map');
   const myLocation = new google.maps.LatLng(10.8230989, 106.6296638);
   const mapOptions = {

@@ -15,7 +15,14 @@
     <body>
     <div class="wrapper_container container">
         <div class="header">VEHICLE MANAGEMENT</div>
-        <div>
+        <div id="sign_in_container" class="form-group">
+            <label for="username">Username</label>
+            <input class="form-control" type="text" id="username" placeholder="Enter your username" maxlength="5">
+            <label for="password">Password</label>
+            <input class="form-control" type="password" id="password" placeholder="Enter your password" maxlength="20">
+            <button id="sign_in" type="button" class="btn btn-outline-success btn-sm btn-block">Sign In</button>
+        </div>
+        <div id="manage_content">
             <div class="row box">
                 <div class="col title">
                     <img src="./resources/user_time.png" alt="" class="image" />
