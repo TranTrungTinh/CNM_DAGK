@@ -259,9 +259,7 @@ $(function() {
     let beforePosition = null;
     let flag = 1;
     google.maps.event.addDomListener(riderMarker , 'dragstart' , event => {
-      if(flag === 1){
-        beforePosition = riderMarker.getPosition();        
-      }
+      if(flag === 1) beforePosition = riderMarker.getPosition();        
     });
     google.maps.event.addDomListener(riderMarker , 'dragend' , event => {
       flag++;
@@ -284,7 +282,7 @@ $(function() {
       $(`#${key}`).off('click');
       $(`#${key}`).on('click', e => {
           e.preventDefault();
-          riderMarker.setPosition(beforePosition);
+          if(beforePosition) riderMarker.setPosition(beforePosition);
           // load cache data
           const cacheDriver = arrCacheData.find(e => e.id == key);
           if(cacheDriver) {
