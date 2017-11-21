@@ -29,8 +29,10 @@ app.post('/order' , parser , (req , res) => {
     }else{
         // console.log('cap nhat lai lich su' ,orderHistory[0] );
         const {id} = orderHistory[0];
-        //B1: Xoa lich su cu
+        //B1: Xoa lich su cu va du lieu trong histories
         db().ref(`history/${id}`).remove();
+        const index = histories.findIndex(e => e.id == id);
+        histories.splice(index , 1);
         //B2: Them user mo
         const { driver , state } = orderHistory[0];
         db().ref('users').push({phone,address,lat,lng,bike,other,state,driver});

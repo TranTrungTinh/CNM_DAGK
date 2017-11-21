@@ -183,7 +183,7 @@ $(function() {
   /* -------------------------------------------------------------- */
 
 
-  // ----------socket.io
+  // ------------ socket.io -----------------
   // listen array driver first connection
   const socket = io();
   socket.on('LIST_DRIVER', arrDrivers => {
@@ -218,7 +218,7 @@ $(function() {
   });
 
   /* -------------------------------------------------------------- */
-  // create marker
+  // create car marker on maps
   function createVehicleMarkers(driver) {
     const pos = { lat: +driver.lat, lng: +driver.lng };
     const newDriverMarker = new google.maps.Marker({
@@ -230,8 +230,10 @@ $(function() {
     });
     arrVehicle.push({pos: newDriverMarker, driver});
   }
-
+  // create user marker on maps
   function createUserMarkers(pos, data) {
+    // let beforeRiderMarker = null; // store before data
+
     const {key,phone,address} = data;
     const content = `
     <div class="info-box-wrap">
@@ -250,8 +252,21 @@ $(function() {
       map: map,
       animation: google.maps.Animation.BOUNCE,
       icon: './resources/user_false.png',
+      draggable: true, 
       title: 'Rider is waiting the diver'
     });
+    // draggable rider marker
+    let beforePosition = null;
+    let flag = 1;
+    google.maps.event.addDomListener(riderMarker , 'dragstart' , event => {
+      if(flag === 1){
+        beforePosition = riderMarker.getPosition();        
+      }
+    });
+    google.maps.event.addDomListener(riderMarker , 'dragend' , event => {
+      flag++;
+    });
+
     // add array
     arrRider.push({id: key , pos: riderMarker });
 
@@ -269,6 +284,7 @@ $(function() {
       $(`#${key}`).off('click');
       $(`#${key}`).on('click', e => {
           e.preventDefault();
+          riderMarker.setPosition(beforePosition);
           // load cache data
           const cacheDriver = arrCacheData.find(e => e.id == key);
           if(cacheDriver) {
@@ -315,8 +331,7 @@ $(function() {
       });
     });
     map.addListener('click', () => info.close());
-  }
-
+  }// end user marker
 
   // handle direction with driver to rider
   function calculateAndDisplayRoute(vehiclePosMarker , userPosMarker) {
