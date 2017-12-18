@@ -87,8 +87,8 @@
        -moz-appearance:none;
             appearance:none;
 }
-.bike{background-image:url('../resources/bike_red.png');}
-.car{background-image:url('../resources/car_red.png');}
+.bike{background-image:url('../../public/images/bike_red.png');}
+.car{background-image:url('../../public/images/car_red.png');}
 
 .cc-selector input:active +.drinkcard-cc{opacity: .9;}
 .cc-selector input:checked +.drinkcard-cc{
