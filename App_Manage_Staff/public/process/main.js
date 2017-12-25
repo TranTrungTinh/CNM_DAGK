@@ -203,12 +203,6 @@ $('#sign_in').click(e => {
   const directionsService = new google.maps.DirectionsService;
   const directionsDisplay = new google.maps.DirectionsRenderer;
 
-  // older marker
-  // let olderDriverMarker = null;
-  // let olderRiderMarker = null;
-  // let olderInfoDriver = null;
-  // let olderInfoRider = null;
-
   // socket.io
   const socket = io();
   socket.on('SEND_LIST_USERS' , rider => {
@@ -333,15 +327,6 @@ $('#sign_in').click(e => {
       icon: './resources/car_blue.png',
       title: 'This is the vehicle'
     });
-    
-    // if(olderDriverMarker) {
-    //   hidden(olderDriverMarker , olderRiderMarker , olderDriverMarker , olderInfoRider);
-    // }
-    // // set older marker
-    // olderDriverMarker = driverMarker;
-    // olderRiderMarker = riderMarker;
-    // olderInfoDriver = infoDriver;
-    // olderInfoRider = infoRider;
 
     // show infowindow
     infoRider.open(map , riderMarker);

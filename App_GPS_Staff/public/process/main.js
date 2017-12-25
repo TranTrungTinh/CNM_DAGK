@@ -1,5 +1,6 @@
 $(function() {
-  let curentWindow = false; // toggle window info
+  let curentWindow = false; // toggle window info rider
+  let curentDriverWindow = false // toggle window info driver 
   const arrVehicle = []; // store position and data driver
   const arrRider = []; // store position and data rider
   const arrCacheData = []; // store cache position rider and position driver
@@ -220,7 +221,15 @@ $(function() {
   /* -------------------------------------------------------------- */
   // create car marker on maps
   function createVehicleMarkers(driver) {
+    const {name} = driver;
     const pos = { lat: +driver.lat, lng: +driver.lng };
+    const content = `
+    <div class="info-box-wrap">
+      <img src="./resources/driver_profile.png" />
+      <div class="info-box-text-wrap">
+        <h6 class="address">${name}</h6>
+      </div>
+    </div>`;
     const newDriverMarker = new google.maps.Marker({
       position: pos,
       map: map,
@@ -229,11 +238,24 @@ $(function() {
       title: 'This is the vehicle'
     });
     arrVehicle.push({pos: newDriverMarker, driver});
+
+    // Create window info driver
+    const info = new google.maps.InfoWindow({ content });
+    newDriverMarker.addListener('mouseover' , () => {
+      if (curentDriverWindow) {
+        curentDriverWindow.close();
+      } // toggle infowindow
+      curentDriverWindow = info;
+      info.open(map, newDriverMarker);
+    });
+    newDriverMarker.addListener('mouseout' , () => {
+      info.close();
+    });
+
   }
   // create user marker on maps
   function createUserMarkers(pos, data) {
-    // let beforeRiderMarker = null; // store before data
-
+    // store before data
     const {key,phone,address} = data;
     const content = `
     <div class="info-box-wrap">
